@@ -1,7 +1,7 @@
 import {KEYS,LABELS,count,validData,historyPoints,stale} from './model.js';
 const $=id=>document.getElementById(id),el=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;};
 const profiles={x:['eightpxdx','https://x.com/eightpxdx'],pixiv:['130668931','https://www.pixiv.net/users/130668931'],instagram:['eightpxdx','https://www.instagram.com/eightpxdx/']};
-const labels={ok:'接続済み',partial:'一部取得',error:'取得エラー',unconfigured:'未接続',unsupported:'接続方法を確認中'};
+const labels={ok:'確認済み',partial:'一部確認',error:'取得エラー',unconfigured:'確認待ち',unsupported:'確認待ち'};
 const viewLabels={x:'インプレッション',pixiv:'作品の閲覧数',instagram:'Views（表示回数）'};
 function date(value){if(!value||!Number.isFinite(Date.parse(value)))return '未取得';return new Intl.DateTimeFormat('ja-JP',{timeZone:'Asia/Tokyo',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(value));}
 function card(c){
@@ -15,7 +15,7 @@ function card(c){
 }
 function renderChart(history){
  const box=$('chart');box.replaceChildren();const series=KEYS.map(platform=>({platform,points:historyPoints(history,platform)})).filter(x=>x.points.length);
- if(!series.length){const empty=el('div',undefined,'chart-empty'),text=el('div');text.append(el('strong','最初のデータ取得を待っています'),el('p','接続後、フォロワーの変化がここに蓄積されます。'));empty.append(text);box.append(empty);return;}
+ if(!series.length){const empty=el('div',undefined,'chart-empty'),text=el('div');text.append(el('strong','最初のデータ取得を待っています'),el('p','ブラウザで確認したフォロワーの変化がここに蓄積されます。'));empty.append(text);box.append(empty);return;}
  const days=[...new Set(series.flatMap(x=>x.points.map(p=>p.day)))].sort(),max=Math.max(1,...series.flatMap(x=>x.points.map(p=>p.followers)));
  const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 900 220');svg.setAttribute('role','img');svg.setAttribute('aria-label','フォロワー推移。詳細はチャンネル別の数値を参照。');
  const node=(tag,attrs,text)=>{const n=document.createElementNS(ns,tag);for(const [k,v]of Object.entries(attrs))n.setAttribute(k,v);if(text!==undefined)n.textContent=text;svg.append(n);return n;};
@@ -32,10 +32,10 @@ function renderChart(history){
 }
 function render(data){
  const channels=KEYS.map(key=>data.channels.find(c=>c.platform===key)).filter(Boolean);
- $('last-check').textContent=data.generatedAt?'最終収集実行 '+date(data.generatedAt):'初回取得待ち';
+ $('last-check').textContent=data.generatedAt?'データ更新 '+date(data.generatedAt):'初回取得待ち';
  $('channel-grid').replaceChildren(...channels.map(card));renderChart(data.history);
  const missing=channels.filter(c=>c.status!=='ok');$('notice').hidden=!missing.length;
- $('notice').textContent=missing.length?'自動取得の接続待ち／確認が必要なサービス：'+missing.map(c=>LABELS[c.platform]).join('・')+'。認証情報がない数値や、取得できなかった数値は表示していません。':'';
+ $('notice').textContent=missing.length?'未確認の項目があるサービス：'+missing.map(c=>LABELS[c.platform]).join('・')+'。ブラウザで確認できた数値のみ表示しています。':'';
  if(channels.some(c=>c.fetchedAt&&stale(c))) {$('notice').hidden=false;$('notice').textContent+=' 36時間以上前のデータがあります。各チャンネルの取得日時を確認してください。';}
 }
 async function refresh(){const b=$('refresh');b.disabled=true;try{const r=await fetch('./data/metrics.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);const data=await r.json();if(!validData(data))throw Error('Invalid data');render(data);}catch{ $('notice').hidden=false;$('notice').textContent='公開データを読み込めませんでした。接続を確認して「表示を更新」を押してください。';$('last-check').textContent='データ読み込みエラー';}finally{b.disabled=false;}}

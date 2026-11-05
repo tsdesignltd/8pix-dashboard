@@ -1,1 +1,15 @@
-{"name":"8pix-dashboard","version":"1.0.0","private":true,"type":"module","scripts":{"test":"node --test test/*.test.mjs","collect":"node scripts/collect.mjs","preview":"python3 -m http.server 4183 --directory site"},"engines":{"node":">=22"}}
+{
+  "name": "8pix-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "collect": "node scripts/collect.mjs",
+    "preview": "python3 -m http.server 4183 --directory site",
+    "import:browser": "node scripts/import-browser.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

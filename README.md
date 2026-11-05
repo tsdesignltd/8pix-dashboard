@@ -1,83 +1,61 @@
 # 8pix Social Monitor
 
-アプリとは独立した、X・pixiv・Instagramの状況を確認するGitHub Pagesサイト。
+[ダッシュボードを開く](https://tsdesignltd.github.io/8pix-dashboard/)
 
-**公開URL：https://tsdesignltd.github.io/8pix-dashboard/**
+アプリとは独立した、X・pixiv・Instagramの確認用GitHub Pagesサイトです。各SNSのフォロワー数・投稿数・表示／閲覧指標と確認日時を表示します。
 
-## 表示するもの
+## ブラウザ確認方式
 
-- フォロワー総数・投稿総数・期間内投稿数
-- X：過去30日に公開した投稿の累計インプレッション（30日間に発生した全インプレッションとは異なります）
-- Instagram：過去30日のアカウントViews。インプレッションと別指標です
-- pixiv：閲覧数・フォロワー数・投稿数の表示枠を用意。公式の自動取得方法は未確認のため、現時点でコレクターは未実装です
-- 各チャンネルの取得日時とエラー状態。日々のフォロワー推移
+API接続から、Codexがブラウザで表示を確認して数値を保存・公開する方式へ切り替えました。APIキー・開発者登録は不要です。GitHub Pages自身がSNSを巡回する仕組みではありません。実行するMacとCodexが必要です。SNSの非公開の分析画面を見る場合は、通常のSNSログインが必要です。
 
-サンプル数値は使いません。未接続・取得できない数値は`null`、画面では「—」です。APIから実際に0を取得した場合だけ0を表示します。SNSごとの数値を表示します。
+「表示を更新」は公開済みJSONの再読み込みです。SNSの確認を開始するボタンではありません。
 
-## 接続方法
+### 対象
 
-### 1. X
+- X：https://x.com/eightpxdx
+- Instagram：https://www.instagram.com/eightpxdx/
+- pixiv：https://www.pixiv.net/users/130668931
 
-対象：https://x.com/eightpxdx
+### 確認のルール
 
-X Developer ConsoleでAPIアクセスを用意し、Bearer TokenをGitHubのSecretsに `X_BEARER_TOKEN` として登録します。APIの利用料金・残高・エンドポイント権限はX側で確認してください。X Premiumの契約とAPIの利用権限は別です。設定前はAPIを呼びません。
+1. 対象アカウントが一致することを確認し、画面に表示された正確な数値だけを記録します。省略表示の「1.2K」等は推測で1200にしません。
+2. フォロワー数、投稿総数、対象30日間の投稿数、表示／閲覧数を区別します。画面にない項目は未確認です。見えている投稿の件数を投稿総数としません。
+3. 表示／閲覧数を記録する場合は、画面で確認できた対象期間と対象範囲を `viewScope` に記載します。一部投稿の表示数をアカウント全体として合算しません。
+4. ログイン要求、CAPTCHA、アクセス制限、安全制限があれば止めます。回避やCookieの抽出は行いません。
+5. 確認した日時を記録します。今回確認できなかったチャンネルの過去値は保持し、確認できたチャンネル内で未確認の項目は空欄へ戻します。36時間以上前の確認値は過去データと表示します。
+6. 公開するのは指標、確認日時、対象プロフィールURLだけです。スクリーンショット、ページ全体、個人連絡先、Cookie、トークン、パスワードはコミットしません。
 
-- GET `/2/users/by/username/eightpxdx?user.fields=public_metrics`
-- GET `/2/users/{id}/tweets?tweet.fields=created_at,public_metrics&exclude=retweets&start_time=...`
+現環境ではpixivへのブラウザアクセスが安全制限でブロックされています。pixivの自動確認は未対応です。別の経路を使って回避しないでください。必要な数値をユーザーが確認して提供する方法は利用できます。
 
-期間内投稿は返信を含み、リポストを除きます。プロフィールの投稿総数はAPIの`tweet_count`をそのまま使用するため、集計対象が異なります。最大20ページを超えたときは期間集計を未取得にします。
+### 記録と公開
 
-公式資料：https://docs.x.com/x-api/fundamentals/metrics / https://docs.x.com/x-api/users/get-posts
+確認した数値を一時JSONにまとめ、次のコマンドで取り込みます。
 
-### 2. Instagram
+```sh
+npm run import:browser -- /absolute/path/observations.json
+npm test
+git add site/data/metrics.json
+git commit -m 'Update verified browser metrics'
+git push
+```
 
-対象：https://www.instagram.com/eightpxdx/
+JSONの `observations` 配列には `platform`（x / pixiv / instagram）、`observedAt`（実際の確認日時のISO形式）、`metrics`（確認したキーのみ）を指定します。数値キーは `followers`、`totalPosts`、`periodPosts`、`views` です。`views` を含める場合は `viewScope` が必須です。未取得を0にしません。空の `metrics` は過去値を更新しません。
 
-InstagramのBusiness/Creatorアカウントに対するInstagram Login方式のAPI接続が必要です。Metaアプリと権限設定はアカウント所有者が行ってください。
+日ごとのフォロワー数は日本時間で保存し、同日再確認は上書きします。履歴は366日保持します。
 
-GitHub Secrets：
+## 公開処理
 
-- `INSTAGRAM_ACCESS_TOKEN`：認証済みのアクセストークン
-- `INSTAGRAM_USER_ID`：そのトークンに対応するInstagramユーザーID
+`.github/workflows/refresh-metrics.yml` は検証済みデータをGitHub Pagesへ公開する処理です。API取得とGitHub Actionsの定期実行は無効にしました。更新はブラウザ確認後のデータコミットを契機に公開します。Codexの定期確認は別途設定が必要です。
 
-GitHub Variables：`INSTAGRAM_API_VERSION`（初期値は`v24.0`）。有効なAPIバージョンに合わせて変更してください。
-
-要求する読み取り：プロフィール（username、followers_count、media_count）、ユーザーinsights（views、period=day、metric_type=total_value、30日）、media（id、timestamp）。Instagram Login方式の基本情報とインサイトに対応する権限を用意します。Meta側の仕様変更・権限・データ提供条件により取得できない指標は、空欄／一部取得のまま表示します。実アカウントへのAPI接続試験は未実施です。
-
-コレクターはAPIが返す次ページURLを直接たどらず、固定ホストとカーソルを使います。トークンを公開URL・ログへ出力しません。
-
-公式資料：https://developers.facebook.com/docs/instagram-platform/insights/ / https://www.postman.com/meta/instagram/documentation/6yqw8pt/instagram-api
-
-### 3. pixiv
-
-対象：https://www.pixiv.net/users/130668931
-
-公式の自動取得APIが確認できていません。非公式APIやログインCookieの転用は行いません。現在は未取得です。公式連携や許可された提供元が決まり次第、コレクターを追加する必要があります。pixivの閲覧数はインプレッションとは異なります。
-
-参考：https://www.pixiv.help/hc/ja/articles/34139670210713
-
-### 自動更新ワークフロー
-
-`.github/workflows/refresh-metrics.yml` を登録済みです。毎日07:00（日本時間）と手動実行で取得・公開します。`automation/refresh-metrics.yml` は同じ内容の参照用テンプレートです。GitHub Actionsのスケジュールは遅延する場合があります。
-
-Pagesの公開元はGitHub Actionsへ設定済みです。認証情報がなければ、データは未取得のままです。
-
-[Secretsを開く](https://github.com/tsdesignltd/8pix-dashboard/settings/secrets/actions) / [Actionsを開く](https://github.com/tsdesignltd/8pix-dashboard/actions)
-
-## 公開範囲
-
-GitHub Pagesの画面、配信JSON、リポジトリは公開です。APIトークンやCookieをコミットしないでください。数値は公開されるため、公開できる指標だけを収集します。クライアント側のパスワードで非公開を装う機能は設けていません。
-
-「表示を更新」は公開済みJSONの再読み込みであり、APIの再実行ではありません。実際の収集はActionsから実行します。失敗したチャンネルの前回値・前回取得日時を保持し、取得失敗を0扱いしません。36時間以上前の値は過去データと表示します。
+以前のAPI取得処理は `scripts/collect.mjs` と `automation/refresh-metrics.yml` に参照用として残しています。現行の公開ワークフローからは呼び出しません。
 
 ## ローカル
 
-Node.js 22以降。追加パッケージ不要です。
+Node.js 22以降、追加パッケージ不要です。
 
 ```sh
 npm test
-npm run collect
 npm run preview
 ```
 
-HTTPサーバーから`site/`を配信してください。API接続はGitHub Secretsまたは環境変数で設定します。トークンをチャットに貼る必要はありません。
+GitHub Pages、配信JSON、リポジトリは公開です。
