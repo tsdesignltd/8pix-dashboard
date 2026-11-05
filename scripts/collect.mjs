@@ -40,11 +40,11 @@ export async function collectInstagram(config,env,fetcher=fetch,now=new Date()){
  const row={...initial().channels[2],status:'ok',followers:n(profile.followers_count),totalPosts:n(profile.media_count),fetchedAt:now.toISOString(),message:'Instagram APIから取得。Viewsはインプレッションと異なる指標です。'};
  const since=Math.floor(now.getTime()/1000)-30*86400,until=Math.floor(now.getTime()/1000);let issues=[];
  try{
-  const result=await json(base+'/insights?'+new URLSearchParams({metric:'views',period:'day',since:String(since),until:String(until)}),env.INSTAGRAM_ACCESS_TOKEN,fetcher);
+  const result=await json(base+'/insights?'+new URLSearchParams({metric:'views',period:'day',metric_type:'total_value',since:String(since),until:String(until)}),env.INSTAGRAM_ACCESS_TOKEN,fetcher);
   const metric=result.data?.find(m=>m.name==='views');
-  // Require a complete daily interval. Empty/omitted data is unknown, not zero.
-  if(!Array.isArray(metric?.values)||metric.values.length<30||!metric.values.every(v=>validNumber(v.value)))throw Error('Missing views');
-  row.views=metric.values.reduce((s,v)=>s+v.value,0);
+  // Read only an explicit total for the requested interval. Empty data is unknown.
+  if(!validNumber(metric?.total_value?.value))throw Error('Missing views');
+  row.views=metric.total_value.value;
  }catch{issues.push('Viewsは未取得');}
  try{
   let after,posts=[],complete=false;

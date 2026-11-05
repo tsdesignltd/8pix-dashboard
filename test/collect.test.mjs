@@ -19,12 +19,17 @@ test('API failure retains actual previous timestamp and never leaks token errors
  const data=await collect({config,previous,env:{X_BEARER_TOKEN:'SECRET'},now,fetcher:()=>{throw Error('SECRET');}});assert.equal(data.channels[0].status,'error');assert.equal(data.channels[0].followers,8);assert.equal(data.channels[0].fetchedAt,'2026-11-01T00:00:00Z');assert.equal(data.history.length,0);assert.equal(JSON.stringify(data).includes('SECRET'),false);assert.equal(stale(data.channels[0],now.getTime()),true);
 });
 test('Instagram metrics use expected profile, insight values and media pagination',async()=>{
- const calls=[],fetcher=async url=>{url=String(url);calls.push(url);if(url.includes('/insights'))return response({data:[{name:'views',values:Array.from({length:30},()=>({value:3}))}]});if(url.includes('/media'))return response(url.includes('after=next')?{data:[{id:'old',timestamp:'2025-01-01T00:00:00Z'}]}:{data:[{id:'new',timestamp:'2026-11-01T00:00:00Z'}],paging:{next:'https://untrusted.invalid/?token=SECRET',cursors:{after:'next'}}});return response({id:'456',username:'eightpxdx',followers_count:23,media_count:5});};
- const row=await collectInstagram(config,{INSTAGRAM_ACCESS_TOKEN:'SECRET',INSTAGRAM_USER_ID:'456'},fetcher,now);assert.equal(row.views,90);assert.equal(row.periodPosts,1);assert.equal(row.followers,23);assert.ok(calls.every(url=>url.startsWith('https://graph.instagram.com/')));assert.equal(calls.some(url=>url.includes('SECRET')),false);
+ const calls=[],fetcher=async url=>{url=String(url);calls.push(url);if(url.includes('/insights'))return response({data:[{name:'views',total_value:{value:90}}]});if(url.includes('/media'))return response(url.includes('after=next')?{data:[{id:'old',timestamp:'2025-01-01T00:00:00Z'}]}:{data:[{id:'new',timestamp:'2026-11-01T00:00:00Z'}],paging:{next:'https://untrusted.invalid/?token=SECRET',cursors:{after:'next'}}});return response({id:'456',username:'eightpxdx',followers_count:23,media_count:5});};
+ const row=await collectInstagram(config,{INSTAGRAM_ACCESS_TOKEN:'SECRET',INSTAGRAM_USER_ID:'456'},fetcher,now);assert.equal(row.views,90);assert.ok(calls.some(url=>url.includes('metric_type=total_value')));assert.equal(row.periodPosts,1);assert.equal(row.followers,23);assert.ok(calls.every(url=>url.startsWith('https://graph.instagram.com/')));assert.equal(calls.some(url=>url.includes('SECRET')),false);
 });
 test('wrong account cannot populate the dashboard',async()=>{
  await assert.rejects(collectInstagram(config,{INSTAGRAM_ACCESS_TOKEN:'token',INSTAGRAM_USER_ID:'456'},async()=>response({username:'wrong'}),now));
 });
 test('partial totals and history show only known observations; invalid payloads fail validation',()=>{
  const data=initial();data.channels[0].followers=10;data.channels[0].periodPosts=0;const a=aggregate(data.channels);assert.equal(a.followers.value,10);assert.equal(a.followers.count,1);assert.equal(a.posts.value,0);assert.equal(historyPoints([{platform:'x',day:'2026-11-05',followers:null}], 'x').length,0);data.channels[0].views=-1;assert.equal(validData(data),false);
+});
+
+test('Instagram empty insights remain unknown instead of zero',async()=>{
+ const fetcher=async url=>response(String(url).includes('/insights')?{data:[]}:String(url).includes('/media')?{data:[]}:{username:'eightpxdx',followers_count:0,media_count:0});
+ const row=await collectInstagram(config,{INSTAGRAM_ACCESS_TOKEN:'token',INSTAGRAM_USER_ID:'456'},fetcher,now);assert.equal(row.views,null);assert.equal(row.periodPosts,0);assert.equal(row.followers,0);assert.equal(row.status,'partial');
 });

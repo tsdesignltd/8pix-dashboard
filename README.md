@@ -42,7 +42,7 @@ GitHub Secrets：
 
 GitHub Variables：`INSTAGRAM_API_VERSION`（初期値は`v24.0`）。有効なAPIバージョンに合わせて変更してください。
 
-要求する読み取り：プロフィール（username、followers_count、media_count）、ユーザーinsights（views、period=day、30日）、media（id、timestamp）。Instagram Login方式の基本情報とインサイトに対応する権限を用意します。Meta側の仕様変更・権限・データ提供条件により取得できない指標は、空欄／一部取得のまま表示します。実アカウントへのAPI接続試験は未実施です。
+要求する読み取り：プロフィール（username、followers_count、media_count）、ユーザーinsights（views、period=day、metric_type=total_value、30日）、media（id、timestamp）。Instagram Login方式の基本情報とインサイトに対応する権限を用意します。Meta側の仕様変更・権限・データ提供条件により取得できない指標は、空欄／一部取得のまま表示します。実アカウントへのAPI接続試験は未実施です。
 
 コレクターはAPIが返す次ページURLを直接たどらず、固定ホストとカーソルを使います。トークンを公開URL・ログへ出力しません。
 
@@ -58,9 +58,9 @@ GitHub Variables：`INSTAGRAM_API_VERSION`（初期値は`v24.0`）。有効なA
 
 ### 自動更新ワークフロー
 
-`automation/refresh-metrics.yml` を `.github/workflows/refresh-metrics.yml` として登録すると、毎日07:00（日本時間）と手動実行で取得します。GitHub Actionsのスケジュールは遅延する場合があります。
+`.github/workflows/refresh-metrics.yml` を登録済みです。毎日07:00（日本時間）と手動実行で取得・公開します。`automation/refresh-metrics.yml` は同じ内容の参照用テンプレートです。GitHub Actionsのスケジュールは遅延する場合があります。
 
-Pagesの公開元をGitHub Actionsへ設定してください。ワークフロー未登録の間は自動取得は動きません。認証情報がなければ、データは未取得のままです。
+Pagesの公開元はGitHub Actionsへ設定済みです。認証情報がなければ、データは未取得のままです。
 
 [Secretsを開く](https://github.com/tsdesignltd/8pix-dashboard/settings/secrets/actions) / [Actionsを開く](https://github.com/tsdesignltd/8pix-dashboard/actions)
 
