@@ -1,4 +1,4 @@
-import {KEYS,LABELS,count,aggregate,validData,historyPoints,stale} from './model.js';
+import {KEYS,LABELS,count,validData,historyPoints,stale} from './model.js';
 const $=id=>document.getElementById(id),el=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;};
 const profiles={x:['eightpxdx','https://x.com/eightpxdx'],pixiv:['130668931','https://www.pixiv.net/users/130668931'],instagram:['eightpxdx','https://www.instagram.com/eightpxdx/']};
 const labels={ok:'接続済み',partial:'一部取得',error:'取得エラー',unconfigured:'未接続',unsupported:'接続方法を確認中'};
@@ -31,11 +31,7 @@ function renderChart(history){
  box.append(svg);
 }
 function render(data){
- const channels=KEYS.map(key=>data.channels.find(c=>c.platform===key)).filter(Boolean),a=aggregate(channels);
- $('total-followers').textContent=count(a.followers.value);$('total-posts').textContent=count(a.posts.value);$('connected-count').textContent=a.connected+' / 3';
- $('followers-note').textContent=a.followers.count?'取得済み '+a.followers.count+'/3 SNS · アカウント間の重複を含む':'取得したチャンネルの合計';
- $('posts-note').textContent=a.posts.count?'過去30日 · 取得済み '+a.posts.count+'/3 SNS':'過去30日に公開した投稿・作品';
- $('connection-note').textContent=a.connected===3?'全サービスから取得済み':'API・取得元の設定が必要です';
+ const channels=KEYS.map(key=>data.channels.find(c=>c.platform===key)).filter(Boolean);
  $('last-check').textContent=data.generatedAt?'最終収集実行 '+date(data.generatedAt):'初回取得待ち';
  $('channel-grid').replaceChildren(...channels.map(card));renderChart(data.history);
  const missing=channels.filter(c=>c.status!=='ok');$('notice').hidden=!missing.length;
