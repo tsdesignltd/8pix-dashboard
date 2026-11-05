@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "generatedAt": "2026-11-05T01:59:43.250Z",
+  "windowDays": 30,
+  "channels": [
+    {
+      "platform": "x",
+      "status": "unconfigured",
+      "followers": null,
+      "totalPosts": null,
+      "periodPosts": null,
+      "views": null,
+      "fetchedAt": null,
+      "viewScope": "過去30日に公開した投稿の累計表示数",
+      "message": "APIの認証情報が未設定です。過去データがある場合は前回取得値を保持しています。"
+    },
+    {
+      "platform": "pixiv",
+      "status": "unsupported",
+      "followers": null,
+      "totalPosts": null,
+      "periodPosts": null,
+      "views": null,
+      "fetchedAt": null,
+      "viewScope": "作品の閲覧数（インプレッションとは異なります）",
+      "message": "公式の自動取得方法を確認中です。現在は未取得です。"
+    },
+    {
+      "platform": "instagram",
+      "status": "unconfigured",
+      "followers": null,
+      "totalPosts": null,
+      "periodPosts": null,
+      "views": null,
+      "fetchedAt": null,
+      "viewScope": "過去30日のアカウントViews",
+      "message": "APIの認証情報が未設定です。過去データがある場合は前回取得値を保持しています。"
+    }
+  ],
+  "history": []
+}

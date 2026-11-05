@@ -1,0 +1,9 @@
+{
+  "brand": "8pix",
+  "windowDays": 30,
+  "accounts": {
+    "x": {"handle":"eightpxdx","url":"https://x.com/eightpxdx"},
+    "instagram": {"handle":"eightpxdx","url":"https://www.instagram.com/eightpxdx/"},
+    "pixiv": {"handle":"130668931","url":"https://www.pixiv.net/users/130668931"}
+  }
+}
