@@ -6,8 +6,13 @@ const viewLabels={x:'インプレッション',pixiv:'作品の閲覧数',instag
 function date(value){if(!value||!Number.isFinite(Date.parse(value)))return '未取得';return new Intl.DateTimeFormat('ja-JP',{timeZone:'Asia/Tokyo',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(value));}
 function card(c){
  const article=el('article',undefined,'channel-card'),head=el('div',undefined,'channel-head'),icon=el('span',c.platform==='x'?'X':c.platform==='pixiv'?'p':'◎','channel-icon '+c.platform);icon.setAttribute('aria-hidden','true');
- const names=el('div',undefined,'channel-name');names.append(el('h3',LABELS[c.platform]));const link=el('a',c.platform==='pixiv'?'ID '+profiles[c.platform][0]+' ↗':'@'+profiles[c.platform][0]+' ↗');link.href=profiles[c.platform][1];link.target='_blank';link.rel='noopener noreferrer';names.append(link);
- head.append(icon,names,el('span',labels[c.status],'status '+c.status));
+ const [handle,profileUrl]=profiles[c.platform];
+ const link=el('a',undefined,'channel-profile');
+ link.href=profileUrl;
+ const names=el('div',undefined,'channel-name');
+ names.append(el('h3',LABELS[c.platform]),el('span',(c.platform==='pixiv'?'ID ':'@')+handle+' ↗','channel-handle'));
+ link.append(icon,names);
+ head.append(link,el('span',labels[c.status],'status '+c.status));
  const primary=el('div',undefined,'channel-primary');primary.append(el('span',viewLabels[c.platform],'metric-label'),el('strong',count(c.views),'primary-number'),el('p',c.viewScope||'取得待ち','metric-scope'));
  const pair=el('div',undefined,'channel-pair');for(const [name,key]of [['フォロワー','followers'],['投稿総数','totalPosts']]){const v=el('div');v.append(el('span',name,'metric-label'),el('strong',count(c[key])));pair.append(v);}
  const foot=el('div',undefined,'channel-foot');foot.append(el('span','期間内投稿 '+count(c.periodPosts)+' 件'),el('span',c.fetchedAt?date(c.fetchedAt)+(stale(c)?' · 過去データ':''):'取得待ち',stale(c)?'stale-label':''));
