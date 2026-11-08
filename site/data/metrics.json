@@ -1,16 +1,16 @@
 {
   "version": 1,
-  "generatedAt": "2026-11-07T22:03:38.574Z",
+  "generatedAt": "2026-11-08T22:01:14.283Z",
   "windowDays": 30,
   "channels": [
     {
       "platform": "x",
       "status": "partial",
-      "followers": 9,
-      "totalPosts": 10,
+      "followers": 12,
+      "totalPosts": 11,
       "periodPosts": null,
       "views": null,
-      "fetchedAt": "2026-11-07T22:03:05.282Z",
+      "fetchedAt": "2026-11-08T22:00:08.348Z",
       "viewScope": "表示・閲覧数は未確認",
       "message": "ブラウザの表示を確認。未確認の項目は「—」で表示しています。",
       "source": "browser",
@@ -30,11 +30,11 @@
     {
       "platform": "instagram",
       "status": "partial",
-      "followers": 6,
+      "followers": 36,
       "totalPosts": null,
       "periodPosts": null,
       "views": null,
-      "fetchedAt": "2026-11-06T22:05:17.321Z",
+      "fetchedAt": "2026-11-08T22:00:02.718Z",
       "viewScope": "表示・閲覧数は未確認",
       "message": "ブラウザの表示を確認。未確認の項目は「—」で表示しています。",
       "source": "browser",
@@ -71,6 +71,16 @@
       "platform": "x",
       "day": "2026-11-08",
       "followers": 9
+    },
+    {
+      "platform": "x",
+      "day": "2026-11-09",
+      "followers": 12
+    },
+    {
+      "platform": "instagram",
+      "day": "2026-11-09",
+      "followers": 36
     }
   ],
   "collectionMode": "browser"
