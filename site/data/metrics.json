@@ -1,17 +1,17 @@
 {
   "version": 1,
-  "generatedAt": "2026-11-08T22:01:14.283Z",
+  "generatedAt": "2026-11-10T03:00:02.558Z",
   "windowDays": 30,
   "channels": [
     {
       "platform": "x",
-      "status": "partial",
-      "followers": 12,
+      "status": "ok",
+      "followers": 15,
       "totalPosts": 11,
-      "periodPosts": null,
-      "views": null,
-      "fetchedAt": "2026-11-08T22:00:08.348Z",
-      "viewScope": "表示・閲覧数は未確認",
+      "periodPosts": 11,
+      "views": 351,
+      "fetchedAt": "2026-11-10T02:59:31.939Z",
+      "viewScope": "確認時点までの直近30日間（日本時間 2026/10/11 11:59〜11/10 11:59）に公開された全11件の投稿の累計表示数",
       "message": "ブラウザの表示を確認。未確認の項目は「—」で表示しています。",
       "source": "browser",
       "sourceUrl": "https://x.com/eightpxdx"
@@ -30,11 +30,11 @@
     {
       "platform": "instagram",
       "status": "partial",
-      "followers": 36,
+      "followers": 62,
       "totalPosts": null,
       "periodPosts": null,
       "views": null,
-      "fetchedAt": "2026-11-08T22:00:02.718Z",
+      "fetchedAt": "2026-11-10T02:59:18.311Z",
       "viewScope": "表示・閲覧数は未確認",
       "message": "ブラウザの表示を確認。未確認の項目は「—」で表示しています。",
       "source": "browser",
@@ -81,6 +81,16 @@
       "platform": "instagram",
       "day": "2026-11-09",
       "followers": 36
+    },
+    {
+      "platform": "x",
+      "day": "2026-11-10",
+      "followers": 15
+    },
+    {
+      "platform": "instagram",
+      "day": "2026-11-10",
+      "followers": 62
     }
   ],
   "collectionMode": "browser"
